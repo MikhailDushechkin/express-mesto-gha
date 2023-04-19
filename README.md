@@ -1,6 +1,11 @@
 [![Tests](../../actions/workflows/tests-13-sprint.yml/badge.svg)](../../actions/workflows/tests-13-sprint.yml) [![Tests](../../actions/workflows/tests-14-sprint.yml/badge.svg)](../../actions/workflows/tests-14-sprint.yml)
 # Проект Mesto фронтенд + бэкенд
 
+Проект Mesto - это сайт, где пользователи могут делиться своими фотографиями и ставить Like на них, пользователь может редактировать свой профиль, просматривать фотографии в увеличенном режиме.
+
+ [Ссылка на репозиторий](https://github.com/MikhailDushechkin/express-mesto-gha)
+
+## Функционал
 
 ## Директории
 
