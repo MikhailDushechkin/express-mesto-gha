@@ -19,22 +19,20 @@ module.exports.createUser = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  const { userId } = req.params;
-
-  User.findById(userId)
+  User.findById(req.params._id)
     .then((user) => {
-      if (!user) {
+      res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
         res
           .status(CodeError.NOT_FOUND)
           .send({ message: 'Пользователь не найден' });
-        return;
+      } else {
+        res
+          .status(CodeError.SERVER_ERROR)
+          .send({ message: 'На сервере произошла ошибка' });
       }
-      res.send({ data: user });
-    })
-    .catch(() => {
-      res
-        .status(CodeError.SERVER_ERROR)
-        .send({ message: 'На сервере произошла ошибка' });
     });
 };
 
