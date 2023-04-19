@@ -12,12 +12,16 @@ module.exports.createUser = (req, res) => {
           .status(CodeError.BAD_REQUEST)
           .send({ message: 'Переданы некорректные данные' });
       }
-      return res.status(CodeError.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+      return res
+        .status(CodeError.SERVER_ERROR)
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.params._id)
+  const { userId } = req.params;
+
+  User.findById(userId)
     .then((user) => {
       if (!user) {
         res
@@ -28,7 +32,9 @@ module.exports.getUser = (req, res) => {
       res.send({ data: user });
     })
     .catch(() => {
-      res.status(CodeError.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+      res
+        .status(CodeError.SERVER_ERROR)
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };
 
@@ -36,7 +42,9 @@ module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
     .catch(() => {
-      res.status(CodeError.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+      res
+        .status(CodeError.SERVER_ERROR)
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };
 
@@ -49,8 +57,15 @@ module.exports.updateUser = (req, res) => {
     { new: true, runValidators: true },
   )
     .then((user) => res.send({ data: user }))
-    .catch(() => {
-      res.status(CodeError.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        return res
+          .status(CodeError.BAD_REQUEST)
+          .send({ message: 'Переданы некорректные данные' });
+      }
+      return res
+        .status(CodeError.SERVER_ERROR)
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };
 
@@ -63,7 +78,14 @@ module.exports.updateAvatar = (req, res) => {
     { new: true, runValidators: true },
   )
     .then((user) => res.send({ data: user }))
-    .catch(() => {
-      res.status(CodeError.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        return res
+          .status(CodeError.BAD_REQUEST)
+          .send({ message: 'Переданы некорректные данные' });
+      }
+      return res
+        .status(CodeError.SERVER_ERROR)
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };

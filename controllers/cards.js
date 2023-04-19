@@ -13,7 +13,9 @@ module.exports.createCard = (req, res) => {
           .status(CodeError.BAD_REQUEST)
           .send({ message: 'Переданы некорректные данные' });
       }
-      return res.status(CodeError.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+      return res
+        .status(CodeError.SERVER_ERROR)
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };
 
@@ -21,7 +23,9 @@ module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
     .catch(() => {
-      res.status(CodeError.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+      res
+        .status(CodeError.SERVER_ERROR)
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };
 
@@ -43,7 +47,9 @@ module.exports.deleteCard = (req, res) => {
       }
     })
     .catch(() => {
-      res.status(CodeError.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+      res
+        .status(CodeError.SERVER_ERROR)
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };
 
@@ -53,9 +59,23 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((likes) => res.send({ data: likes }))
-    .catch(() => {
-      res.status(CodeError.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+    .then((likes) => {
+      if (!likes) {
+        return res
+          .status(CodeError.NOT_FOUND)
+          .send({ message: 'Лайк не найден' });
+      }
+      return res.send({ data: likes });
+    })
+    .catch((err) => {
+      if (err) {
+        return res
+          .status(CodeError.BAD_REQUEST)
+          .send({ message: 'Неверный запрос' });
+      }
+      return res
+        .status(CodeError.SERVER_ERROR)
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };
 
@@ -65,8 +85,18 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
-    .then((likes) => res.send({ data: likes }))
-    .catch(() => {
-      res.status(CodeError.SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+    .then((likes) => {
+      if (!likes) {
+        res.status(CodeError.NOT_FOUND).send({ message: 'Лайк не найден' });
+      }
+      res.send({ data: likes });
+    })
+    .catch((err) => {
+      if (err) {
+        return res.status(CodeError.BAD_REQUEST).send({ message: 'Лайк не найден' });
+      }
+      return res
+        .status(CodeError.SERVER_ERROR)
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };
