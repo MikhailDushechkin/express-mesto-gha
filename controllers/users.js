@@ -21,18 +21,22 @@ module.exports.createUser = (req, res) => {
 module.exports.getUser = (req, res) => {
   User.findById(req.params._id)
     .then((user) => {
-      res.send({ data: user });
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
+      if (!user) {
         res
           .status(CodeError.NOT_FOUND)
           .send({ message: 'Пользователь не найден' });
-      } else {
-        res
-          .status(CodeError.SERVER_ERROR)
-          .send({ message: 'На сервере произошла ошибка' });
       }
+      res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        return res
+          .status(CodeError.BAD_REQUEST)
+          .send({ message: 'Некорректный запрос' });
+      }
+      return res
+        .status(CodeError.SERVER_ERROR)
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };
 
