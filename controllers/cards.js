@@ -1,5 +1,5 @@
 const Card = require('../models/card');
-const { CodeError } = require('../errorCode');
+const { CodeError } = require('../utils/errorCode');
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
@@ -9,11 +9,12 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res
+        res
           .status(CodeError.BAD_REQUEST)
           .send({ message: 'Переданы некорректные данные' });
+        return;
       }
-      return res
+      res
         .status(CodeError.SERVER_ERROR)
         .send({ message: 'На сервере произошла ошибка' });
     });
@@ -21,7 +22,7 @@ module.exports.createCard = (req, res) => {
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.send({ data: cards }))
+    .then((cards) => res.status(200).send({ data: cards }))
     .catch(() => {
       res
         .status(CodeError.SERVER_ERROR)
@@ -46,7 +47,13 @@ module.exports.deleteCard = (req, res) => {
         Card.findByIdAndRemove(cardId).then((data) => res.send(data));
       }
     })
-    .catch(() => {
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res
+          .status(CodeError.BAD_REQUEST)
+          .send({ message: 'Некорректный запрос' });
+        return;
+      }
       res
         .status(CodeError.SERVER_ERROR)
         .send({ message: 'На сервере произошла ошибка' });
@@ -61,19 +68,17 @@ module.exports.likeCard = (req, res) => {
   )
     .then((likes) => {
       if (!likes) {
-        return res
-          .status(CodeError.NOT_FOUND)
-          .send({ message: 'Лайк не найден' });
+        res.status(CodeError.NOT_FOUND).send({ message: 'Лайк не найден' });
+        return;
       }
-      return res.send({ data: likes });
+      res.status(200).send({ data: likes });
     })
     .catch((err) => {
-      if (err) {
-        return res
-          .status(CodeError.BAD_REQUEST)
-          .send({ message: 'Неверный запрос' });
+      if (err.name === 'CastError') {
+        res.status(CodeError.BAD_REQUEST).send({ message: 'Неверный запрос' });
+        return;
       }
-      return res
+      res
         .status(CodeError.SERVER_ERROR)
         .send({ message: 'На сервере произошла ошибка' });
     });
@@ -88,14 +93,16 @@ module.exports.dislikeCard = (req, res) => {
     .then((likes) => {
       if (!likes) {
         res.status(CodeError.NOT_FOUND).send({ message: 'Лайк не найден' });
+        return;
       }
-      res.send({ data: likes });
+      res.status(200).send({ data: likes });
     })
     .catch((err) => {
-      if (err) {
-        return res.status(CodeError.BAD_REQUEST).send({ message: 'Лайк не найден' });
+      if (err.name === 'CastError') {
+        res.status(CodeError.BAD_REQUEST).send({ message: 'Лайк не найден' });
+        return;
       }
-      return res
+      res
         .status(CodeError.SERVER_ERROR)
         .send({ message: 'На сервере произошла ошибка' });
     });

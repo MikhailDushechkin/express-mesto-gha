@@ -1,18 +1,19 @@
 const User = require('../models/user');
-const { CodeError } = require('../errorCode');
+const { CodeError } = require('../utils/errorCode');
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res
+        res
           .status(CodeError.BAD_REQUEST)
           .send({ message: 'Переданы некорректные данные' });
+        return;
       }
-      return res
+      res
         .status(CodeError.SERVER_ERROR)
         .send({ message: 'На сервере произошла ошибка' });
     });
@@ -25,8 +26,9 @@ module.exports.getUser = (req, res) => {
         res
           .status(CodeError.NOT_FOUND)
           .send({ message: 'Пользователь не найден' });
+        return;
       }
-      res.send({ data: user });
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
@@ -42,7 +44,7 @@ module.exports.getUser = (req, res) => {
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.status(200).send({ data: users }))
     .catch(() => {
       res
         .status(CodeError.SERVER_ERROR)
@@ -58,7 +60,15 @@ module.exports.updateUser = (req, res) => {
     { name, about },
     { new: true, runValidators: true },
   )
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        res
+          .status(CodeError.NOT_FOUND)
+          .send({ message: 'Пользователь не найден' });
+        return;
+      }
+      res.status(200).send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         return res
@@ -79,7 +89,15 @@ module.exports.updateAvatar = (req, res) => {
     { avatar },
     { new: true, runValidators: true },
   )
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        res
+          .status(CodeError.NOT_FOUND)
+          .send({ message: 'Пользователь не найден' });
+        return;
+      }
+      res.status(200).send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         return res
