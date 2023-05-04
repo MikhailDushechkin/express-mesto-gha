@@ -13,7 +13,7 @@ const auth = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, 'jwt-secret-key');
+    payload = jwt.verify(token, 'jwt-secret');
   } catch (err) {
     next(new UnAuthorizedError('Необходимо авторизироваться'));
   }
