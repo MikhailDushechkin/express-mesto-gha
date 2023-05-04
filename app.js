@@ -30,7 +30,7 @@ app.use('*', () => {
   throw new NotFoundError('Ресурс не найден');
 });
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
+mongoose.connect('mongodb://127.0.0.1:27017/mestodbnew', {
   useNewUrlParser: true,
 });
 
