@@ -9,17 +9,18 @@ const ConflictError = require('../errors/ConflictError');
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findUserByCreadentials(email, password).then((user) => {
-    const token = jwt.sign({ _id: user._id }, 'jwt-secret-key', {
-      expiresIn: '7d',
-    });
-    res.cookie('jwt', token, {
-      maxAge: 3600000 * 24 * 7,
-      httpOnly: true,
-    });
+  return User.findUserByCreadentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'jwt-secret-key', {
+        expiresIn: '7d',
+      });
+      res.cookie('jwt', token, {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+      });
 
-    res.send({ token });
-  })
+      res.send({ token });
+    })
     .catch(() => {
       next(new UnAuthorizedError('Неверный email или password'));
     });
@@ -27,7 +28,11 @@ module.exports.login = (req, res, next) => {
 
 module.exports.createUser = (req, res, next) => {
   const {
-    name, about, avatar, email, password,
+    name,
+    about,
+    avatar,
+    email,
+    password,
   } = req.body;
 
   bcrypt
@@ -39,7 +44,13 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then((user) => res.status(201).send({ data: user }))
+    .then((user) => res.status(201).send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      _id: user._id,
+      email: user.email,
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ConflictError('Такой пользователь уже существует'));
