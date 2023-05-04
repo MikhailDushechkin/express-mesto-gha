@@ -9,7 +9,7 @@ const ConflictError = require('../errors/ConflictError');
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findOne({ email, password })
+  return User.findUserByCredentials({ email, password })
     .then((user) => {
       if (!user) {
         return Promise.reject(new UnAuthorizedError('Неправильные email или password'));
