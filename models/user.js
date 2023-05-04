@@ -40,6 +40,7 @@ const userSchema = new mongoose.Schema(
         validator(email) {
           return isEmail(email);
         },
+        message: 'Почта пользователя введена неверно',
       },
     },
     password: {

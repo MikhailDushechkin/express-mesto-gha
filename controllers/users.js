@@ -6,28 +6,24 @@ const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError');
 
-module.exports.login = (req, res, next) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials({ email, password })
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
         return Promise.reject(new UnAuthorizedError('Неправильные email или password'));
       }
-      const token = jwt.sign({ _id: user._id }, 'jwt-secret-key', {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', {
         expiresIn: '7d',
       });
-      res.cookie('jwt', token, {
-        maxAge: 3600000 * 24 * 7,
-        httpOnly: true,
-      });
 
-      res.send({ message: 'Все в порядке!' });
+      res.send({ token });
       return bcrypt.compare(password, user.password);
     })
     .then((matched) => {
       if (!matched) {
-        Promise.reject(new Error('Неправильные email или password'));
+        Promise.reject(new UnAuthorizedError('Неправильные email или password'));
         return;
       }
       res.send({ message: 'Всё верно!' });
@@ -37,7 +33,7 @@ module.exports.login = (req, res, next) => {
     });
 };
 
-module.exports.createUser = (req, res, next) => {
+const createUser = (req, res, next) => {
   const {
     name,
     about,
@@ -64,7 +60,7 @@ module.exports.createUser = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ConflictError('Такой пользователь уже существует'));
+        next(new BadRequestError('Переданы некорректные данные'));
         return;
       }
       if (err.code === 11000) {
@@ -75,7 +71,7 @@ module.exports.createUser = (req, res, next) => {
     });
 };
 
-module.exports.getUser = (req, res, next) => {
+const getUser = (req, res, next) => {
   User.findById(req.params._id)
     .then((user) => {
       if (!user) {
@@ -93,13 +89,13 @@ module.exports.getUser = (req, res, next) => {
     });
 };
 
-module.exports.getUsers = (req, res, next) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send(users))
     .catch(next);
 };
 
-module.exports.updateUser = (req, res, next) => {
+const updateUser = (req, res, next) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
@@ -122,7 +118,7 @@ module.exports.updateUser = (req, res, next) => {
     });
 };
 
-module.exports.updateAvatar = (req, res, next) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -143,4 +139,13 @@ module.exports.updateAvatar = (req, res, next) => {
       }
       next(err);
     });
+};
+
+module.exports = {
+  login,
+  createUser,
+  getUser,
+  getUsers,
+  updateAvatar,
+  updateUser,
 };

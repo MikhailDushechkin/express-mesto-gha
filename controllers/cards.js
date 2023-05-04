@@ -2,7 +2,7 @@ const Card = require('../models/card');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 
-module.exports.createCard = (req, res, next) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
 
@@ -16,13 +16,13 @@ module.exports.createCard = (req, res, next) => {
     });
 };
 
-module.exports.getCards = (req, res, next) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards))
     .catch(next);
 };
 
-module.exports.deleteCard = (req, res, next) => {
+const deleteCard = (req, res, next) => {
   const { userId } = req.user;
   const { cardId } = req.params;
 
@@ -44,7 +44,7 @@ module.exports.deleteCard = (req, res, next) => {
     });
 };
 
-module.exports.likeCard = (req, res, next) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -64,7 +64,7 @@ module.exports.likeCard = (req, res, next) => {
     });
 };
 
-module.exports.dislikeCard = (req, res, next) => {
+const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
@@ -82,4 +82,12 @@ module.exports.dislikeCard = (req, res, next) => {
       }
       next(err);
     });
+};
+
+module.exports = {
+  createCard,
+  getCards,
+  deleteCard,
+  likeCard,
+  dislikeCard,
 };
