@@ -1,5 +1,6 @@
 const { celebrate, Joi } = require('celebrate');
 
+// eslint-disable-next-line
 const linkRegExp = /(http:\/\/|https:\/\/)(www)*[a-z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]+#*/;
 
 module.exports.idValidation = celebrate({
