@@ -65,9 +65,11 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ConflictError('Такой пользователь уже существует'));
+        return;
       }
       if (err.code === 11000) {
         next(new ConflictError('Такой пользователь уже существует'));
+        return;
       }
       next(err);
     });
@@ -78,12 +80,14 @@ module.exports.getUser = (req, res, next) => {
     .then((user) => {
       if (!user) {
         next(new BadRequestError('Пользователь не найден'));
+        return;
       }
-      res.status(200).send({ data: user });
+      res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadRequestError('Некорректный запрос'));
+        return;
       }
       next(err);
     });
@@ -91,7 +95,7 @@ module.exports.getUser = (req, res, next) => {
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.status(200).send({ data: users }))
+    .then((users) => res.status(200).send(users))
     .catch(next);
 };
 
@@ -107,11 +111,12 @@ module.exports.updateUser = (req, res, next) => {
       if (!user) {
         next(new NotFoundError('Пользователь не найден'));
       }
-      res.status(200).send({ data: user });
+      res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
+        return;
       }
       next(err);
     });
@@ -129,11 +134,12 @@ module.exports.updateAvatar = (req, res, next) => {
       if (!user) {
         next(new NotFoundError('Пользователь не найден'));
       }
-      res.status(200).send({ data: user });
+      res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
+        return;
       }
       next(err);
     });

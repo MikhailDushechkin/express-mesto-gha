@@ -7,7 +7,7 @@ module.exports.createCard = (req, res, next) => {
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
-    .then((card) => res.status(201).send({ data: card }))
+    .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
@@ -18,7 +18,7 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => res.status(200).send({ data: cards }))
+    .then((cards) => res.status(200).send(cards))
     .catch(next);
 };
 
@@ -54,7 +54,7 @@ module.exports.likeCard = (req, res, next) => {
       if (!likes) {
         next(new NotFoundError('Лайк не найден'));
       }
-      res.status(200).send({ data: likes });
+      res.status(200).send(likes);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -74,7 +74,7 @@ module.exports.dislikeCard = (req, res, next) => {
       if (!likes) {
         next(new NotFoundError('Лайк не найден'));
       }
-      res.status(200).send({ data: likes });
+      res.status(200).send(likes);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
