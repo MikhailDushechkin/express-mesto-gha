@@ -9,8 +9,11 @@ const ConflictError = require('../errors/ConflictError');
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findUserByCreadentials(email, password)
+  return User.findOne({ email, password })
     .then((user) => {
+      if (!user) {
+        return Promise.reject(new UnAuthorizedError('Неправильные email или password'));
+      }
       const token = jwt.sign({ _id: user._id }, 'jwt-secret-key', {
         expiresIn: '7d',
       });
@@ -19,7 +22,15 @@ module.exports.login = (req, res, next) => {
         httpOnly: true,
       });
 
-      res.send({ token });
+      res.send({ message: 'Все в порядке!' });
+      return bcrypt.compare(password, user.password);
+    })
+    .then((matched) => {
+      if (!matched) {
+        Promise.reject(new Error('Неправильные email или password'));
+        return;
+      }
+      res.send({ message: 'Всё верно!' });
     })
     .catch(() => {
       next(new UnAuthorizedError('Неверный email или password'));

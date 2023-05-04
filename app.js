@@ -23,8 +23,8 @@ app.use(cookieParser());
 app.post('/signin', loginValidation, login);
 app.post('/signup', userValidation, createUser);
 
-app.use('/', auth, usersRouter);
-app.use('/', auth, cardsRouter);
+app.use('/users', auth, usersRouter);
+app.use('/cards', auth, cardsRouter);
 
 app.use('*', () => {
   throw new NotFoundError('Ресурс не найден');
