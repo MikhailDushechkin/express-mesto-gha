@@ -53,10 +53,8 @@ const likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(new NotFoundError('Лайк не найден'))
     .then((likes) => {
-      if (!likes) {
-        next(new NotFoundError('Лайк не найден'));
-      }
       res.status(200).send({ data: likes });
     })
     .catch((err) => {
@@ -74,10 +72,8 @@ const dislikeCard = (req, res, next) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(new NotFoundError('Лайк не найден'))
     .then((likes) => {
-      if (!likes) {
-        next(new NotFoundError('Лайк не найден'));
-      }
       res.status(200).send({ data: likes });
     })
     .catch((err) => {

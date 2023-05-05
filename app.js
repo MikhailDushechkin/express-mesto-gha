@@ -20,7 +20,7 @@ app.use(helmet());
 app.use(mainRouter);
 
 app.use(errors());
-// app.use(responseError);
+app.use(responseError);
 
 app.listen(PORT, () => {
   console.log('Сервер запущен и работает в штатном режиме');
