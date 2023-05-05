@@ -25,15 +25,13 @@ const getCards = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  const { cardId } = req.params;
-
-  Card.findById(cardId)
+  Card.findById(req.params.cardId)
     .orFail(new NotFoundError('Карточка не найдена'))
     .then((card) => {
       if (`${card.owner}` !== req.user._id) {
         throw new ForbiddenError('Удаление чужой карточки невозможно');
       }
-      return Card.findByIdAndRemove(cardId);
+      return Card.findByIdAndDelete(req.params.cardId);
     })
     .then((card) => {
       res.status(200).send({ data: card });
