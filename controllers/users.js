@@ -92,12 +92,8 @@ const getUsers = (req, res, next) => {
 
 const getUserProfile = (req, res, next) => {
   User.findById(req.user._id)
-    .then((user) => {
-      if (!user) {
-        next(new NotFoundError('Пользователь не найден'));
-      } else { res.send({ data: user }); }
-    })
-    .catch((error) => { next(error); });
+    .then((user) => res.send({ data: user }))
+    .catch(next);
 };
 
 const updateUser = (req, res, next) => {
