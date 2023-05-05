@@ -8,8 +8,8 @@ const usersRouter = require('./users');
 const NotFoundError = require('../errors/NotFoundError');
 
 // Регистрация и вход
-mainRouter.post('/signup', loginValidation, createUser);
-mainRouter.post('/signin', userValidation, login);
+mainRouter.post('/signup', userValidation, createUser);
+mainRouter.post('/signin', loginValidation, login);
 
 // С защитой авторизации
 mainRouter.use('/cards', auth, cardsRouter);
