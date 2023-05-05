@@ -9,6 +9,12 @@ const idValidation = celebrate({
   }),
 });
 
+const idCardValidation = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24).hex(),
+  }),
+});
+
 const loginValidation = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -49,6 +55,7 @@ const cardValidation = celebrate({
 module.exports = {
   linkRegExp,
   idValidation,
+  idCardValidation,
   loginValidation,
   userAboutValidation,
   userValidation,
