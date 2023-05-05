@@ -51,16 +51,17 @@ const likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(new NotFoundError('Лайк не найден'))
-    .then((likes) => {
-      res.status(200).send({ data: likes });
+    .then((card) => {
+      if (card) {
+        res.send({ data: card });
+      } else { next(new NotFoundError('Карточка не найдена')); }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Некорректный запрос'));
-        return;
+        next(new BadRequestError('Неккоректный запрос'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -70,15 +71,17 @@ const dislikeCard = (req, res, next) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(new NotFoundError('Лайк не найден'))
-    .then((likes) => {
-      res.status(200).send({ data: likes });
+    .then((card) => {
+      if (card) {
+        res.send({ data: card });
+      } else { next(new NotFoundError('Карточка не найдена')); }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректный запрос'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
