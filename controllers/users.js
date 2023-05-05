@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const UnAuthorizedError = require('../errors/UnAuthorizedError');
@@ -28,8 +28,8 @@ const login = (req, res, next) => {
       }
       res.send({ message: 'Всё верно!' });
     })
-    .catch(() => {
-      next(new UnAuthorizedError('Неверный email или password'));
+    .catch((err) => {
+      next(err);
     });
 };
 
@@ -61,13 +61,11 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
-        return;
-      }
-      if (err.code === 11000) {
+      } else if (err.code === 11000) {
         next(new ConflictError('Такой пользователь уже существует'));
-        return;
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -75,10 +73,10 @@ const getUser = (req, res, next) => {
   User.findById(req.params._id)
     .then((user) => {
       if (!user) {
-        next(new BadRequestError('Пользователь не найден'));
+        next(new NotFoundError('Пользователь не найден'));
         return;
       }
-      res.status(200).send(user);
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
@@ -91,7 +89,7 @@ const getUser = (req, res, next) => {
 
 const getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.status(200).send(users))
+    .then((users) => res.status(200).send({ data: users }))
     .catch(next);
 };
 
@@ -106,8 +104,9 @@ const updateUser = (req, res, next) => {
     .then((user) => {
       if (!user) {
         next(new NotFoundError('Пользователь не найден'));
+        return;
       }
-      res.status(200).send(user);
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
@@ -130,7 +129,7 @@ const updateAvatar = (req, res, next) => {
       if (!user) {
         next(new NotFoundError('Пользователь не найден'));
       }
-      res.status(200).send(user);
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {

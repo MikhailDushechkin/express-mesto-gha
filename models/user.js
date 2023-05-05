@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
-const isEmail = require('validator/lib/isEmail');
-const { linkRegExp } = require('../middlewares/validate');
+const validator = require('validator');
 
 const UnAuthorizedError = require('../errors/UnAuthorizedError');
 
@@ -27,19 +26,16 @@ const userSchema = new mongoose.Schema(
       default:
         'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
       validate: {
-        validator(link) {
-          return linkRegExp.test(link);
-        },
-        message: 'Необоходимо ввести ссылку',
+        validator: (link) => validator.isURL(link),
+        message: 'Ошибка при передаче ссылки для аватара',
       },
     },
     email: {
       type: String,
       unique: true,
+      required: true,
       validate: {
-        validator(email) {
-          return isEmail(email);
-        },
+        validator: (email) => validator.isEmail(email),
         message: 'Почта пользователя введена неверно',
       },
     },
@@ -56,10 +52,7 @@ const userSchema = new mongoose.Schema(
 );
 
 // eslint-disable-next-line
-userSchema.statics.findUserByCredentials = function (
-  email,
-  password,
-) {
+userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email })
     .select('+password')
     .then((user) => {
