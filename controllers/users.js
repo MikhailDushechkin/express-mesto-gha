@@ -69,13 +69,10 @@ const createUser = (req, res, next) => {
     });
 };
 
-const getUser = (req, res, next) => {
+const getUserId = (req, res, next) => {
   User.findById(req.params._id)
+    .orFail(new NotFoundError('Пользователь не найден'))
     .then((user) => {
-      if (!user) {
-        next(new NotFoundError('Пользователь не найден'));
-        return;
-      }
       res.status(200).send({ data: user });
     })
     .catch((err) => {
@@ -91,6 +88,16 @@ const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send({ data: users }))
     .catch(next);
+};
+
+const getUserProfile = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        next(new NotFoundError('Пользователь не найден'));
+      } else { res.send({ data: user }); }
+    })
+    .catch((error) => { next(error); });
 };
 
 const updateUser = (req, res, next) => {
@@ -140,8 +147,9 @@ const updateAvatar = (req, res, next) => {
 module.exports = {
   login,
   createUser,
-  getUser,
+  getUserId,
   getUsers,
+  getUserProfile,
   updateAvatar,
   updateUser,
 };

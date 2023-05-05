@@ -4,15 +4,16 @@ const { userAboutValidation, avatarValidation, idValidation } = require('../midd
 
 const {
   createUser,
-  getUser,
+  getUserId,
   getUsers,
+  getUserProfile,
   updateUser,
   updateAvatar,
 } = require('../controllers/users');
 
 usersRouter.get('/', getUsers);
-usersRouter.get('/:_id', idValidation, getUser);
-usersRouter.get('/me', idValidation, getUser);
+usersRouter.get('/:_id', idValidation, getUserId);
+usersRouter.get('/me', getUserProfile);
 usersRouter.post('/', createUser);
 usersRouter.patch('/me', userAboutValidation, updateUser);
 usersRouter.patch('/me/avatar', avatarValidation, updateAvatar);
