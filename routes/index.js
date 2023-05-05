@@ -15,7 +15,7 @@ mainRouter.post('/signin', loginValidation, login);
 mainRouter.use('/cards', auth, cardsRouter);
 mainRouter.use('/users', auth, usersRouter);
 
-mainRouter.use('*', auth, (req, res, next) => {
+mainRouter.use('*', (req, res, next) => {
   next(new NotFoundError('Страница не найдена'));
 });
 
